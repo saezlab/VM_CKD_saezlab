@@ -2,15 +2,19 @@
 
 Created by: Victoria Muckerson
 
-This repo explores CKD datasets and attempts to classify different CKD by their molecular data.
-Included in this analysis is, but not limited to, hierarchical clustering, differential
-expression analysis, and signaling pathway impact analysis. 
+This repo explores datasets containing microarray datasets of chronic kidney disease (CKD) samples
+and attempts to separate and identify CKDs from healthy control samples and other CKDs by their molecular
+data. Separation is attempted via hierarchical clustering of the gene expression matrix and the most variable
+genes for each data set, differential expression analysis is used to obtain these most variable genes and 
+identify potential disease signature genes, and pathway analysis is used to attempt to define diseases by
+their pathway representation and pathway activities. 
 
 
 **How to run**
 
 The code should be run starting with Data_download_and_pca to obtain and visualize data from GEO, followed
-by Clustering to attempt to cluster the data, then DEA, and finally Functional Analysis for SPIA.
+by Clustering to attempt to cluster the data, then DEA via Limma, and finally Functional Analysis for SPIA and
+pathway activity prediction via Progeny.
 
 
 The Data_download_and_pca code is built to be an executable file for well annotated microarray datasets.
@@ -23,8 +27,10 @@ A pca is run again in this script albeit using only the most variable genes.
 
 The differential expression analysis:
 This script is performed using the phenotypic and gene expression data obtained from the downloaded data in
-the first script. Limma is used to perform a DEA and the results are used in a matrix multiplication to produce
-what I called a "disease score". The disease score is defined in the script and visualized via box plots.
+the first script. Limma is used to perform a DEA and the resulting t scores are multiplied by the expression
+matrix of each dataset (for the disease of interest and control samples) using matrix multiplication to produce
+what is refered to as a "disease score". The disease score is further defined in the script and visualized via
+box plots.
 
 
 Functional Analysis:
@@ -35,9 +41,9 @@ and can therefore be skipped if another input option is preferable for the obser
 
 
 The original datasets used to create this repo were GSE20602, GSE32591, GSE37460, and GSE47183. However, for
-simplification and due to time sensitivity, the datasets used in the final draft of this code were changed to GSE104948,
-GSE32591, and GSE37460 which include only glomerular data of which the diseases Lupus Nephropathy/Systemic Lupus
-Erythematosus, IgA Nephropathy, and Hypertensive Nephropathy were used to compare to controls.
+simplification and due to time sensitivity, the datasets used in the final draft of this code were changed to
+GSE104948, GSE32591, and GSE37460 which include only glomerular data of which the diseases Lupus Nephropathy/Systemic
+Lupus Erythematosus, IgA Nephropathy, and Hypertensive Nephropathy were used to compare to controls.
 
 
 Dependencies:
