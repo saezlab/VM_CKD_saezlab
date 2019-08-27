@@ -17,14 +17,23 @@ not including df12.
 To use a different dataset GEO, simply replace the number in "(GEO = '')" in line 38
 and change the respective file name when saving.
 The following libraries are required:
+
 GEOquery
+
 qusage
+
 Biobase
+
 annotate
+
 hgu133a.db
+
 ggbiplot
+
 tidyverse
+
 Rtsne
+
 
 When clustering the data:
 The phenotypic data and gene expression data is used from the downloaded data obtained by the first script.
@@ -32,25 +41,40 @@ The top 2000 most variable genes are used to cluster the data - in order to chan
 genes used, change the "2000" in lines 62-64 to the desired amount.
 A pca is run again in this script albeit using only the most variable genes.
 The following libraries are required:
+
 cluster
+
 dbscan
+
 BiocManager
+
 mclust
+
 tidyverse
+
 ConsensusClusterPlus
+
 ALL
+
 dplyr
+
 ComplexHeatmap
+
 ggbiplot
+
 
 The differential expression analysis:
 This script is performed using the phenotypic and gene expression data obtained from the downloaded data in
 the first script. Limma is used to perform a DEA and the results are used in a matrix multiplication to produce
 what I called a "disease score". The disease score is defined in the script and visualized via box plots.
 The following libraries are required:
+
 limma
+
 tidyverse
+
 BiocManager
+
 
 Functional Analysis:
 This script uses phenotypic, feature, and gene expression data obtained in the first script as well as the DEA
@@ -58,12 +82,19 @@ results produced in the DEA script. Using this data, SPIA is performed to obtain
 information is then used with Progeny to predict pathway activities. SPIA is not the only input option for Progeny
 and can therefore be skipped if another input option is preferable for the observed data.
 The following libraries are required:
+
 msigdbr
+
 SPIA
+
 tidyverse
+
 dplyr
+
 plyr
+
 progeny
+
 
 The original datasets used to create this repo were GSE20602, GSE32591, GSE37460, and GSE47183. However, for
 simplification and due to time sensitivity, the datasets used in the final draft of this code were changed to GSE104948,
