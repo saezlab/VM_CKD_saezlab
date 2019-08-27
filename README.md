@@ -4,11 +4,12 @@ Created by: Victoria Muckerson
             victoria.muckerson@gmail.com
 
 This repo explores microarray datasets containing chronic kidney disease (CKD) samples and attempts to separate
-and identify CKDs from healthy control samples and other CKDs by their molecular data. Separation is attempted
-via hierarchical clustering of the gene expression matrix and the most variable genes for each data set,
-differential expression analysis (DEA) is used to obtain these most variable genes and identify potential disease
-signature genes, and pathway analysis is used to attempt to define diseases by their pathway representation and
+and identify CKDs from healthy control samples and other CKDs by their molecular data. The desired separation is attempted
+via hierarchical clustering of the gene expression matrix and the most variable genes for each data set.
+Differential expression analysis (DEA) is used to obtain these most variable genes and identify potential disease
+signature genes while pathway analysis is used to attempt to define diseases by their pathway representation and
 pathway activities. 
+
 
 
 **How to run**
@@ -18,15 +19,18 @@ by [Clustering](https://github.com/saezlab/VM_CKD_saezlab/blob/master/Clustering
 pathway impact analysis ([SPIA](http://bioconductor.org/packages/release/bioc/html/SPIA.html)) and pathway activity prediction via [Progeny](http://bioconductor.org/packages/release/bioc/html/progeny.html).
 
 
+
 *Data Importation*
 
 The [Data_download_and_pca](https://github.com/saezlab/VM_CKD_saezlab/blob/master/Data_download_and_pca.Rmd) code is built to be an executable file for well annotated microarray datasets.
+
 
 
 *Clustering*
 
 The phenotypic data and gene expression data is used from the downloaded data obtained by the first script.
 A `pca` is run again in this script albeit using only the most variable genes.
+
 
 
 *DEA*
@@ -39,6 +43,7 @@ the degree of similarity between differentially expressed genes from different d
 is visualized via box plots.
 
 
+
 *Functional Analysis*
 
 This script uses phenotypic, feature, and gene expression data obtained in the first script as well as the `DEA`
@@ -47,9 +52,11 @@ information is then used with `Progeny` to predict pathway activities. `SPIA` is
 and can therefore be skipped if another input option is preferable for the observed data.
 
 
+
 The original datasets used to create this repo are listed in the .tsv file [DATASETS_LIST_Vic's](https://github.com/saezlab/VM_CKD_saezlab/blob/master/DATASETS_LIST%20_Vic's.tsv). However, for
 simplification purposes and due to time sensitivity, the datasets used in the final draft of this code were limited to
 [GSE104948](https://www.ncbi.nlm.nih.gov/geo/query/acc.cgi?acc=GSE104948), [GSE32591](https://www.ncbi.nlm.nih.gov/geo/query/acc.cgi?acc=GSE32591), and [GSE37460](https://www.ncbi.nlm.nih.gov/geo/query/acc.cgi) which include only glomerular data of which the diseases Lupus Nephropathy/Systemic Lupus Erythematosus, IgA Nephropathy, and Hypertensive Nephropathy were used in addition to control samples.
+
 
 
 *Dependencies:*
