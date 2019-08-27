@@ -56,6 +56,7 @@ and can therefore be skipped if another input option is preferable for the obser
 The original datasets used to create this repo are listed in the .tsv file [DATASETS_LIST_Vic's](https://github.com/saezlab/VM_CKD_saezlab/blob/master/DATASETS_LIST%20_Vic's.tsv). However, for
 simplification purposes and due to time sensitivity, the datasets used in the final draft of this code were limited to
 [GSE104948](https://www.ncbi.nlm.nih.gov/geo/query/acc.cgi?acc=GSE104948), [GSE32591](https://www.ncbi.nlm.nih.gov/geo/query/acc.cgi?acc=GSE32591), and [GSE37460](https://www.ncbi.nlm.nih.gov/geo/query/acc.cgi) which include only glomerular data of which the diseases Lupus Nephropathy/Systemic Lupus Erythematosus, IgA Nephropathy, and Hypertensive Nephropathy were used in addition to control samples.
+Original R files for these Rmds can be found [here](https://github.com/vmuckerson/Chronic_kidney_disease).
 
 
 
