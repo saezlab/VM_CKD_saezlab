@@ -41,7 +41,7 @@ information is then used with Progeny to predict pathway activities. SPIA is not
 and can therefore be skipped if another input option is preferable for the observed data.
 
 
-The original datasets used to create this repo are listed in the .tsv file "DATASET_LIST_Vic's". However, for
+The original datasets used to create this repo are listed in the .tsv file "DATASETS_LIST_Vic's". However, for
 simplification purposes and due to time sensitivity, the datasets used in the final draft of this code were limited to
 GSE104948, GSE32591, and GSE37460 which include only glomerular data of which the diseases Lupus Nephropathy/Systemic
 Lupus Erythematosus, IgA Nephropathy, and Hypertensive Nephropathy were used in addition to control samples.
