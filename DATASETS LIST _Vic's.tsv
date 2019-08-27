@@ -14,7 +14,3 @@ GSE110699	Comparing Wilms tumor primary samples to patient-derived xenografts	No
 Missing	An eQTL Landscape of Kidney Tissue in Human Nephrotic Syndrome	Gillies, C. E., Putler, R., Menon, R., Otto, E., Yasutake, K., Nair, V., . . . McNulty,M. T. (2018). An eQTL Landscape of Kidney Tissue in Human Nephrotic Syndrome. AJHG, 103(2), 232-244. doi:https://doi.org/10.1016/j.ajhg.2018.07.004	EX	Wrong Technology	Single Cell	Glomerular and Tubulointerstitial	Total: 73;
 Missing	Redefining Nephrotic Syndrome in Molecular Terms:  Outcome-associated molecular clusters and patient stratification with noninvasive surrogate biomarkers		EX	Wrong Technology	Total RNA seq	Glomerular and Tubulointerstitial	Total: 132;
 GSE121190	Expression Profiling of Fibroblasts in  Chronic and Acute Disease Models	Higashi AY, Aronow BJ, Dressler GR. Expression Profiling of Fibroblasts  in Chronic and Acute Disease Models Reveals Novel Pathways  in Kidney Fibrosis. J Am Soc Nephrol 2019 Jan;30(1):80-94. PMID: 30545984	EX	Wrong Species (mouse), Disease, and Tissue	Microarray	Fibroblasts	Total: 15; Induced kidney damage/repair(12), Healthy (3)								GPL11180
-
-
-
-Not mentioned in Ferenc's data sets
