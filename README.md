@@ -2,7 +2,7 @@
 
 Created by: Victoria Muckerson
 
-This repo explores CKD datasets and attempts to classify different CKD by there molecular data.
+This repo explores CKD datasets and attempts to classify different CKD by their molecular data.
 Included in this analysis is, but not limited to, hierarchical clustering, differential
 expression analysis, and signaling pathway impact analysis. 
 
