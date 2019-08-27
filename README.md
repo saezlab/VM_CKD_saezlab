@@ -26,11 +26,12 @@ A pca is run again in this script albeit using only the most variable genes.
 
 
 The differential expression analysis:
-This script is performed using the phenotypic and gene expression data obtained from the downloaded data in
-the first script. Limma is used to perform a DEA and the resulting t scores are multiplied by the expression
-matrix of each dataset (for the disease of interest and control samples) using matrix multiplication to produce
-what is refered to as a "disease score". The disease score is further defined in the script and visualized via
-box plots.
+This script uses the phenotypic and gene expression data obtained from the downloaded data in
+the first script. Limma is used to perform DEA and the resulting t scores in combination with the expression
+matrix of each dataset (for the disease of interest and control samples) are used to create a linear model
+using matrix multiplication to produce what is refered to as a "disease score". The disease score illustrates
+the degree of similarity between differentially expressed genes from different datasets of the same disease and
+is visualized via box plots.
 
 
 Functional Analysis:
