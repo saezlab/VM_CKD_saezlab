@@ -12,7 +12,7 @@ pathway activities.
 
 
 
-**How to run**
+###How to run
 
 The code should be run starting with [Data_download_and_pca](https://github.com/saezlab/VM_CKD_saezlab/blob/master/Data_download_and_pca.Rmd) to obtain and visualize data from GEO, followed
 by [Clustering](https://github.com/saezlab/VM_CKD_saezlab/blob/master/Clustering.Rmd) to attempt to cluster the data, then [DEA](https://github.com/saezlab/VM_CKD_saezlab/blob/master/DEA.Rmd) via [Limma](https://bioconductor.org/packages/release/bioc/html/limma.html), and finally [Functional_Analysis]() for signal
@@ -20,20 +20,20 @@ pathway impact analysis ([SPIA](http://bioconductor.org/packages/release/bioc/ht
 
 
 
-*Data Importation*
+####Data Importation
 
 The [Data_download_and_pca](https://github.com/saezlab/VM_CKD_saezlab/blob/master/Data_download_and_pca.Rmd) code is built to be an executable file for well annotated microarray datasets.
 
 
 
-*Clustering*
+####Clustering
 
 The phenotypic data and gene expression data is used from the downloaded data obtained by the first script.
 A `pca` is run again in this script albeit using only the most variable genes.
 
 
 
-*DEA*
+####DEA
 
 This script uses the phenotypic and gene expression data obtained from the downloaded data in
 the first script. [Limma](https://bioconductor.org/packages/release/bioc/html/limma.html) is used to perform `DEA` and the resulting t scores in combination with the expression
@@ -44,7 +44,7 @@ is visualized via box plots.
 
 
 
-*Functional Analysis*
+####Functional Analysis
 
 This script uses phenotypic, feature, and gene expression data obtained in the first script as well as the `DEA`
 results produced in the [DEA](https://github.com/saezlab/VM_CKD_saezlab/blob/master/DEA.Rmd) script. Using this data, `SPIA` is performed to obtain pathway impact information. This
@@ -59,7 +59,7 @@ simplification purposes and due to time sensitivity, the datasets used in the fi
 
 
 
-*Dependencies:*
+####Dependencies:
 
 - ALL
 - annotate
