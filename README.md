@@ -2,12 +2,12 @@
 
 Created by: Victoria Muckerson
 
-This repo explores datasets containing microarray datasets of chronic kidney disease (CKD) samples
-and attempts to separate and identify CKDs from healthy control samples and other CKDs by their molecular
-data. Separation is attempted via hierarchical clustering of the gene expression matrix and the most variable
-genes for each data set, differential expression analysis is used to obtain these most variable genes and 
-identify potential disease signature genes, and pathway analysis is used to attempt to define diseases by
-their pathway representation and pathway activities. 
+This repo explores microarray datasets containing chronic kidney disease (CKD) samples and attempts to separate
+and identify CKDs from healthy control samples and other CKDs by their molecular data. Separation is attempted
+via hierarchical clustering of the gene expression matrix and the most variable genes for each data set,
+differential expression analysis is used to obtain these most variable genes and identify potential disease
+signature genes, and pathway analysis is used to attempt to define diseases by their pathway representation and
+pathway activities. 
 
 
 **How to run**
