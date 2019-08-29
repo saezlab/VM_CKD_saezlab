@@ -20,7 +20,7 @@ Original R files for these Rmds can be found [here](https://github.com/vmuckerso
 
 
 The code should be run starting with [Data_download_and_pca](https://github.com/saezlab/VM_CKD_saezlab/blob/master/Data_download_and_pca.Rmd) to obtain and visualize data from GEO, followed
-by [Clustering](https://github.com/saezlab/VM_CKD_saezlab/blob/master/Clustering.Rmd) to attempt to cluster the data, then [DEA](https://github.com/saezlab/VM_CKD_saezlab/blob/master/DEA.Rmd) via [Limma](https://bioconductor.org/packages/release/bioc/html/limma.html), and finally [Functional_Analysis](https://github.com/saezlab/VM_CKD_saezlab/blob/master/Functional_Analysis.Rmd) for signal
+by [Clustering](https://github.com/saezlab/VM_CKD_saezlab/blob/master/Clustering.Rmd) to attempt to cluster the data, then [DEA](https://github.com/saezlab/VM_CKD_saezlab/blob/master/DEA.Rmd) for differential expression analysis via [Limma](https://bioconductor.org/packages/release/bioc/html/limma.html), and finally [Functional_Analysis](https://github.com/saezlab/VM_CKD_saezlab/blob/master/Functional_Analysis.Rmd) for signal
 pathway impact analysis ([SPIA](http://bioconductor.org/packages/release/bioc/html/SPIA.html)) and pathway activity prediction via [Progeny](http://bioconductor.org/packages/release/bioc/html/progeny.html).
 
 
