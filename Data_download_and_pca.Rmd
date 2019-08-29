@@ -9,7 +9,9 @@ output: html_document
 knitr::opts_chunk$set(echo = FALSE)
 ```
 
-## This document outlines the uploading of a chronic kidney disease data set GSE104948 (glomerular tissue) from GEO. The data set uses two platforms (GPL22945 and GPL24120) and is divided accordingly. This document concludes with the production of pca and tsne plots colored by a phenotypic variable.
+## Summary
+
+This document outlines the uploading of a chronic kidney disease data set GSE104948 (glomerular tissue) from GEO. The data set contains data obtained via two different platforms (GPL22945 and GPL24120); for batch effect minimization when comparing to other datasets, only the platform GPL24120 is used for analysis. This document concludes with the production of pca and tsne plots colored by a phenotypic variable.
 
 
 ## Download necessary libraries
@@ -29,157 +31,109 @@ library(Rtsne)
 
 ```
 
-## Downloading the data and separating the phenotypic data from the expression data. Variables named based on tissue type and platform.
+## Downloading the data
+The data is downloaded from GEO and the phenotypic, expression, and feature data is collected. Though only one platform is used for analysis, the feature data annotation for the data from the other platform contains necessary information that the data of interest does not. Therefore, here, the feature data for both platforms is downloaded.
 
 ```{r}
 
 ###Download the preprocessed data from GEO#######
 
 mydata <- getGEO(GEO = 'GSE104948')
-data1 <- mydata[[1]]
-data2 <- mydata[[2]]
+findata <- mydata[[2]]
+otherplat <- mydata[[1]]
 
 
 #####Separate the phenotypic, expression, and feature data from the large files#####
 
 #Phenotypic
-Pdata1 <- pData(data1)
-Pdata2 <- pData(data2)
+
+Pdata <- pData(findata)
+Pdata$`diagnosis:ch1`[is.na(Pdata$`diagnosis:ch1`)] <- "Healthy"
 
 
 #Expression data as a data frame
-Exdata1 <- as.data.frame(exprs(data1))
-Exdata2 <- as.data.frame(exprs(data2))
+Exdata <- exprs(findata) %>% as.data.frame()
 
 
 #Feature data
-fdata1 <- fData(data1)
-fdata2 <- fData(data2)
+Fdata <- fData(findata)
+Fdataother <- fData(otherplat)
+
+!all(Fdata$ID %in% Fdataother$ID)
 
 ```
 
-## A dataframe is created for each data set (4) and Gene Symbols are used to annotate the row names. A matching table is created so the Gene Symbols replacing the Gene IDs are matched correctly.
+## Create a dataframe with desired annotation
 
-##The feature data contains the symbol information and can be used for this annotation. If the feature data does not contain this information, one could use biomaRt to obtain the necessary gene annotation.
+A dataframe is created for the data set with Gene Symbols used to annotate the row names. A matching table is created so that the Gene Symbols (obtained from the feature data) replacing the Gene IDs is correctly matched. The sample names are also added as column names and the probe values for each gene are mean aggregated so that each gene contains one value.
 
 ```{r}
 
-#####Annotate data frames with Gene Symbols instead of IDs#######
+#Annotate data frames with Gene Symbols instead of IDs
+matching_table <- Fdataother %>% dplyr::select(ID, Symbol)
 
-##Data with Gene Symbol data
-matching_table1 <- fdata1[,c("ID", "Symbol")] %>%
-  as_tibble()
-
-df1 <- Exdata1 %>%
+df <- Exdata %>%
   rownames_to_column("ID") %>%
-  gather(sample, expression,-ID) %>%
-  as_tibble()
+  gather(sample, expression,-ID)
 
-df1 <- inner_join(matching_table1, df1, by="ID") %>%
-  select(-ID) %>% 
+
+df <- inner_join(matching_table, df, by="ID") %>%
+  dplyr::select(-ID) %>% 
   spread(sample, expression) %>%
-  data.frame(row.names = 1, check.names = F, stringsAsFactors = F) %>%
-  as.data.frame()
-
-matching_table2 <- fdata1[,c("ID", "Symbol")] %>%
-  as_tibble()
-
-df2 <- Exdata2 %>%
-  rownames_to_column("ID") %>%
-  gather(sample, expression,-ID) %>%
-  as_tibble()
-
-df2 <- inner_join(matching_table2, df2, by="ID") %>%
-  select(-ID) %>% 
-  spread(sample, expression) %>%
-  data.frame(row.names = 1, check.names = F, stringsAsFactors = F) %>%
-  as.data.frame()
+  data.frame(row.names = 1, check.names = F, stringsAsFactors = F)
 
 
 #Adding Gene symbols to df
-df1$gene <- matching_table1$Symbol
-df2$gene <- matching_table2$Symbol
+df$gene <- matching_table$Symbol
 
-```
-
-
-##  The data frames are annotated with the Gene Symbols and sample names. If there were multiple probe values for a gene, the values were mean aggregated. The final dataframe as well as the initial Phenotypic and Expression data are saved as an rds file.
-
-
-```{r}
 
 #Aggregate the probe values
-df12 <- aggregate(. ~gene, data = df1, mean)
-df22 <- aggregate(. ~gene, data = df2, mean)
+df1 <- aggregate(. ~gene, data = df, mean)
+
 
 #annotate df
-row.names(df12) <- df12$gene
-df12 <- df12[,-1]
-colnames(df12) <- Pdata1$geo_accession
-
-row.names(df22) <- df22$gene
-df22 <- df22[,-1]
-colnames(df22) <- Pdata2$geo_accession
-
-df12 <- na.omit(df12)
-df22 <- na.omit(df22)
-
-#Save everything
-saveRDS(df12, file="./all_104948.rds")
-saveRDS(Pdata1, file="./Pdata_104948.rds")
-saveRDS(Exdata1, file="./Ex_104948.rds")
-
-saveRDS(df22, file="./all_104954.rds")
-saveRDS(Pdata2, file="./Pdata_104954.rds")
-saveRDS(Exdata2, file="./Ex_104954.rds")
-
+row.names(df1) <- df1$gene
+df1 <- df1[,-1]
+colnames(df1) <- Pdata$geo_accession
+df1 <- na.omit(df1)
 ```
 
-## The data is visualized via a pca plot to identify any underlying associations in the data. To change the variable that the plot is colored by, change the "groups" variable in the ggbiplot function.
+## Data Visualization
 
-
-## Pca results are saved and then a tsne plot is produced to see if results are similar. Since the results were seemingly well explained with a pca, the non-linear dimensional reduction provided by a tsne seemed superfluous and was not used.
+The data is visualized via a pca plot to identify any underlying associations in the data. To change the variable that the plot is colored by, change the "groups" variable in the ggbiplot function. A tsne plot is also produced for comparison to the pca results.
+Since the results were seemingly well explained with a pca, the non-linear dimensional reduction provided by a tsne could potentially be deemed superfluous. However, the consistent data behavior is important to note.
 
 ```{r, echo = FALSE}
 
 ######Dimension Reduction######
+##PCAs
 
-#PCAs
-matdata1 <- as.matrix(data1)
+#Glomerular data set
+matdata1 <- as.matrix(df1)
 pca1<- prcomp(t(matdata1), center=TRUE, scale. = TRUE)
 ggbiplot(pca1,
          obs.scale = 1,
          var.scale = 1,
          var.axes = FALSE,
-         groups = Pdata1$`diagnosis:ch1`) +
-  ggtitle("PCA of GSE104948 Platform GPL22945")
-
-
-matdata2 <- as.matrix(data2)
-pca2<- prcomp(t(matdata2), center=TRUE, scale. = TRUE)
-ggbiplot(pca2,
-         obs.scale = 1,
-         var.scale = 1,
-         var.axes = FALSE,
-         groups = Pdata2$`diagnosis:ch1`) +
-  ggtitle("PCA of GSE104948 Platform GPL24120")
-
-#saveRDS(pca1, file="./pca_104948.rds")
-#saveRDS(pca2, file="./pca_104954.rds")
-
+         groups = Pdata$`diagnosis:ch1`) +
+  ggtitle("PCA of GSE104948")
 
 #Multidimensional scaling (mds)
 gsne <- Rtsne(t(matdata1), perplexity = 10, theta = 0.01)
 
-plot(gsne$Y, col = as.factor(Pdata1$`diagnosis:ch1`), pch = 19,
-     main = "tSNE plot for GSE104948 Platform 22945")
+plot(gsne$Y, col = as.factor(Pdata$`diagnosis:ch1`), pch = 19,
+     main = "tSNE plot for GSE104948")
 ```
 
-#This data is further analyzed via clustering here:
-https://github.com/vmuckerson/Chronic_kidney_disease/blob/master/Clustering_Glom.R
+The final obtained via this pipeline (variables df1, Pdata, and Fdata) are used in other scripts contained in this repository. 
 
 
-# and via DEA here:
-https://github.com/vmuckerson/Chronic_kidney_disease/blob/master/Diff_expression_analysis.R
+This data is further analyzed via clustering here:
+https://github.com/saezlab/VM_CKD_saezlab/blob/master/Clustering.Rmd
 
+via DEA here:
+https://github.com/saezlab/VM_CKD_saezlab/blob/master/DEA.Rmd
+
+and via various Functional Analyses here:
+https://github.com/saezlab/VM_CKD_saezlab/blob/master/Functional_Analysis.Rmd
 
