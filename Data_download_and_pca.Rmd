@@ -50,7 +50,8 @@ otherplat <- mydata[[1]]
 
 
 ##Download phenotypic, expression, and feature data 
-Though only one platform is used for analysis, the feature data annotation for the data from the other platform contains necessary information 
+Though only one platform is used for analysis, the feature data annotation for 
+the data from the other platform contains necessary information 
 that the data of interest does not. Therefore, here, the feature data for both
 platforms is downloaded.
 
