@@ -11,7 +11,7 @@ knitr::opts_chunk$set(include = FALSE)
 
 ## Summary
 
-This document outlines the uploading of a chronic kidney disease data set 
+This document outlines the downloading of a chronic kidney disease data set 
 GSE104948 (glomerular tissue) from GEO. The data set contains data obtained via 
 two different platforms (GPL22945 and GPL24120); for batch effect minimization 
 when comparing to other datasets, only the platform GPL24120 is used for 
@@ -19,13 +19,13 @@ analysis. This document concludes with the production of pca and tsne plots
 colored by a phenotypic variable.
 
 
-## Download necessary libraries
+## Load necessary libraries
 
 Loading the required dependencies for the code to execute everything.
 
 ```{r message=FALSE, warning=FALSE}
 
-#Download libraries
+#Load libraries
 
 library(GEOquery)
 library(qusage)
@@ -98,7 +98,7 @@ df <- Exdata %>%
   gather(sample, expression,-ID)
 
 
-df <- inner_join(matching_table, df, by="ID") %>%
+df <- inner_join(matching_table, df, by = "ID") %>%
   dplyr::select(-ID) %>% 
   spread(sample, expression) %>%
   data.frame(row.names = 1, check.names = F, stringsAsFactors = F)
@@ -135,7 +135,7 @@ superfluous. However, the consistent data behavior is important to note.
 #Dimension Reduction
 #PCA
 matdata1 <- as.matrix(df1)
-pca1<- prcomp(t(matdata1), center=TRUE, scale. = TRUE)
+pca1<- prcomp(t(matdata1), center = TRUE, scale. = TRUE)
 ggbiplot(pca1,
          obs.scale = 1,
          var.scale = 1,
