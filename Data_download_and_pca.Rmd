@@ -6,7 +6,7 @@ output: html_document
 ---
 
 ```{r setup}
-knitr::opts_chunk$set(echo = FALSE)
+knitr::opts_chunk$set(include = FALSE)
 ```
 
 ## Summary
@@ -21,7 +21,9 @@ colored by a phenotypic variable.
 
 ## Download necessary libraries
 
-```{r}
+Loading the required dependencies for the code to execute everything.
+
+```{r message=FALSE, warning=FALSE}
 
 #Download libraries
 
@@ -39,7 +41,7 @@ library(Rtsne)
 ## Downloading the data
 The data is downloaded from GEO.
 
-```{r}
+```{r message=FALSE, warning=FALSE}
 
 #Download the preprocessed data from GEO
 
@@ -55,7 +57,7 @@ the data from the other platform contains necessary information
 that the data of interest does not. Therefore, here, the feature data for both
 platforms is downloaded.
 
-```{r}
+```{r message=FALSE, warning=TRUE}
 #Phenotypic
 
 Pdata <- pData(findata)
@@ -86,7 +88,7 @@ are also added as column names and the probe values for each gene are mean
 aggregated so that each gene contains one value.
 The value of the first row is not mapped to a specific gene and is thus removed.
 
-```{r}
+```{r message=FALSE, warning=FALSE}
 
 #Match Gene symbols to ID in the correct order
 matching_table <- Fdataother %>% dplyr::select(ID, Symbol)
@@ -128,7 +130,7 @@ Since the results were seemingly well explained with a pca, the non-linear
 dimensional reduction provided by a tsne could potentially be deemed 
 superfluous. However, the consistent data behavior is important to note.
 
-```{r, echo = FALSE}
+```{r}
 
 #Dimension Reduction
 #PCA
