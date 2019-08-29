@@ -1,5 +1,5 @@
 ---
-title: "Data upload"
+title: "Data download and visualization"
 author: Victoria Muckerson
 date: 8/8/2019
 output: html_document
@@ -11,7 +11,12 @@ knitr::opts_chunk$set(echo = FALSE)
 
 ## Summary
 
-This document outlines the uploading of a chronic kidney disease data set GSE104948 (glomerular tissue) from GEO. The data set contains data obtained via two different platforms (GPL22945 and GPL24120); for batch effect minimization when comparing to other datasets, only the platform GPL24120 is used for analysis. This document concludes with the production of pca and tsne plots colored by a phenotypic variable.
+This document outlines the uploading of a chronic kidney disease data set 
+GSE104948 (glomerular tissue) from GEO. The data set contains data obtained via 
+two different platforms (GPL22945 and GPL24120); for batch effect minimization 
+when comparing to other datasets, only the platform GPL24120 is used for 
+analysis. This document concludes with the production of pca and tsne plots 
+colored by a phenotypic variable.
 
 
 ## Download necessary libraries
@@ -32,19 +37,24 @@ library(Rtsne)
 ```
 
 ## Downloading the data
-The data is downloaded from GEO and the phenotypic, expression, and feature data is collected. Though only one platform is used for analysis, the feature data annotation for the data from the other platform contains necessary information that the data of interest does not. Therefore, here, the feature data for both platforms is downloaded.
+The data is downloaded from GEO.
 
 ```{r}
 
-###Download the preprocessed data from GEO#######
+#Download the preprocessed data from GEO
 
 mydata <- getGEO(GEO = 'GSE104948')
 findata <- mydata[[2]]
 otherplat <- mydata[[1]]
+```
 
 
-#####Separate the phenotypic, expression, and feature data from the large files#####
+##Download phenotypic, expression, and feature data 
+Though only one platform is used for analysis, the feature data annotation for the data from the other platform contains necessary information 
+that the data of interest does not. Therefore, here, the feature data for both
+platforms is downloaded.
 
+```{r}
 #Phenotypic
 
 Pdata <- pData(findata)
@@ -59,17 +69,25 @@ Exdata <- exprs(findata) %>% as.data.frame()
 Fdata <- fData(findata)
 Fdataother <- fData(otherplat)
 
-!all(Fdata$ID %in% Fdataother$ID)
+
+#Ensure all gene IDs in fdata are identical
+stopifnot(all(Fdata$ID %in% Fdataother$ID))
 
 ```
 
+
 ## Create a dataframe with desired annotation
 
-A dataframe is created for the data set with Gene Symbols used to annotate the row names. A matching table is created so that the Gene Symbols (obtained from the feature data) replacing the Gene IDs is correctly matched. The sample names are also added as column names and the probe values for each gene are mean aggregated so that each gene contains one value.
+A dataframe is created for the data set with Gene Symbols used to annotate the 
+row names. A matching table is created so that the Gene Symbols (obtained from 
+the feature data) replacing the Gene IDs is correctly matched. The sample names 
+are also added as column names and the probe values for each gene are mean 
+aggregated so that each gene contains one value.
+The value of the first row is not mapped to a specific gene and is thus removed.
 
 ```{r}
 
-#Annotate data frames with Gene Symbols instead of IDs
+#Match Gene symbols to ID in the correct order
 matching_table <- Fdataother %>% dplyr::select(ID, Symbol)
 
 df <- Exdata %>%
@@ -83,32 +101,36 @@ df <- inner_join(matching_table, df, by="ID") %>%
   data.frame(row.names = 1, check.names = F, stringsAsFactors = F)
 
 
-#Adding Gene symbols to df
+#Add Gene symbols to df
 df$gene <- matching_table$Symbol
 
 
-#Aggregate the probe values
+#Mean aggregate the multiple probe values for same gene
 df1 <- aggregate(. ~gene, data = df, mean)
 
 
-#annotate df
+#Annotate df rows (genes) and columns (samples)
 row.names(df1) <- df1$gene
 df1 <- df1[,-1]
 colnames(df1) <- Pdata$geo_accession
 df1 <- na.omit(df1)
 ```
 
+
 ## Data Visualization
 
-The data is visualized via a pca plot to identify any underlying associations in the data. To change the variable that the plot is colored by, change the "groups" variable in the ggbiplot function. A tsne plot is also produced for comparison to the pca results.
-Since the results were seemingly well explained with a pca, the non-linear dimensional reduction provided by a tsne could potentially be deemed superfluous. However, the consistent data behavior is important to note.
+The data is visualized via a pca plot to identify any underlying associations in 
+the data. To change the variable that the plot is colored by, change the 
+"groups" variable in the ggbiplot function. A tsne plot is also produced for
+comparison to the pca results.
+Since the results were seemingly well explained with a pca, the non-linear
+dimensional reduction provided by a tsne could potentially be deemed 
+superfluous. However, the consistent data behavior is important to note.
 
 ```{r, echo = FALSE}
 
-######Dimension Reduction######
-##PCAs
-
-#Glomerular data set
+#Dimension Reduction
+#PCA
 matdata1 <- as.matrix(df1)
 pca1<- prcomp(t(matdata1), center=TRUE, scale. = TRUE)
 ggbiplot(pca1,
@@ -118,14 +140,16 @@ ggbiplot(pca1,
          groups = Pdata$`diagnosis:ch1`) +
   ggtitle("PCA of GSE104948")
 
-#Multidimensional scaling (mds)
+#tSNE
 gsne <- Rtsne(t(matdata1), perplexity = 10, theta = 0.01)
 
 plot(gsne$Y, col = as.factor(Pdata$`diagnosis:ch1`), pch = 19,
      main = "tSNE plot for GSE104948")
 ```
 
-The final obtained via this pipeline (variables df1, Pdata, and Fdata) are used in other scripts contained in this repository. 
+
+The final obtained via this pipeline (variables df1, Pdata, and Fdata) are used 
+in other scripts contained in this repository. 
 
 
 This data is further analyzed via clustering here:
