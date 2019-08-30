@@ -9,14 +9,19 @@ output: html_document
 knitr::opts_chunk$set(echo = FALSE)
 ```
 
-This document outlines the functional analysis of microarray datasets GSE104948 and GSE32591 and the lupus nephropathy and control samples they contain. Signal pathway impact analysis (SPIA) is performed using the differentially expressed genes (DEGs) between the healthy and sick phenotypes to obtain pathway representation information. Following, Progeny is used to predict the pathway activity.
+This document outlines the functional analysis of microarray datasets GSE104948
+and GSE32591 and the lupus nephropathy and control samples they contain. Signal
+pathway impact analysis (SPIA) is performed using the differentially expressed
+genes (DEGs) between the healthy and sick phenotypes to obtain pathway
+representation information. Following, Progeny is used to predict the pathway
+activity.
 
 
-##Download necessary libraries
+##Load libraries
 
 ```{r}
 
-#Download libraries
+#Load libraries
 
 library(msigdbr)
 library(SPIA)
@@ -28,7 +33,10 @@ library(progeny)
 ```
 
 
-## Download [data] (https://github.com/saezlab/VM_CKD_saezlab/blob/master/Data_download_and_pca.Rmd) and [DEA results](https://github.com/saezlab/VM_CKD_saezlab/blob/master/DEA.Rmd)
+## Load data from previous pipelines
+
+[data](https://github.com/saezlab/VM_CKD_saezlab/blob/master/Data_download_and_pca.Rmd)
+[DEA results](https://github.com/saezlab/VM_CKD_saezlab/blob/master/DEA.Rmd)
 
 ```{r}
 
@@ -50,6 +58,8 @@ DEA_results3 <- readRDS(file="./LN_DEA_32591.rds")
 
 
 ## Select DEGs
+Select for "significantly" (adjusted p-value < 0.05) differentially expressed
+genes between the lupus nephropathy and healthy phenotypes.
 
 ```{r}
 
@@ -66,6 +76,7 @@ DEG3 <- DEA_results3[DEgenes3,]
 
 
 ## Annotate by Entrez ID
+Use the Entrez ID to annotate a data frame as the functional tools require.
 
 ```{r}
 
@@ -115,6 +126,8 @@ names(de3) <- colnames(de3)
 
 
 ## Obtain reference pathways from MSigDB
+Load a reference library of pathways that SPIA will use to run an ORA with the
+addition of topological information.
 
 ```{r}
 
@@ -125,6 +138,8 @@ msig <- msigdbr(species = "Homo sapiens", category = NULL,
 
 
 ## Perform SPIA
+Signal pathway impact analysis is used to determine which pathways are truly
+affected by the differential expression of the significant genes.
 
 ```{r}
 
@@ -149,17 +164,219 @@ spia_results3 <- spia(de = de3,
 ```
 
 
-## Run Progeny
+## Run Progeny and perform a PCA
+Progeny predicts pathway activities and returns a matrix of pathway scores that
+are then used to try and separate lupus and healthy phenotypes. The result is
+visualized in a pca plot.
+
+```{r}
+## Progeny
+
+
+onlyLN <- Pdata1$`diagnosis:ch1` == "Healthy" | Pdata1$`diagnosis:ch1` == "Systemic Lupus Erythematosus"
+data1LN <- data1[,onlyLN]
+Pdata1LN <- Pdata1[onlyLN,]
+
+
+pathways1 <- progeny(as.matrix(data1LN), scale = TRUE)
+pathways3 <- progeny(as.matrix(data3), scale = TRUE)
+
+
+pca1 <- prcomp(pathways1, center=TRUE, scale. = TRUE)
+ggbiplot(pca1,
+         obs.scale = 1,
+         var.scale = 1,
+         var.axes = FALSE,
+         groups = Pdata1LN$`diagnosis:ch1`) +
+  ggtitle("PCA of GSE104948 Pathways")
+
+pca3 <- prcomp(pathways3, center=TRUE, scale. = TRUE)
+ggbiplot(pca3,
+         obs.scale = 1,
+         var.scale = 1,
+         var.axes = FALSE,
+         groups = Pdata3$disease) +
+  ggtitle("PCA of GSE32591 Pathways")
 
 
 
 
+```
+
+
+#PCA of raw data
+For visual comparison of the data, the original preprocessed data is visualized
+in a pca plot.
+
+```{r}
+## PCA of raw data for comparison
+
+pca <- prcomp(t(data1LN), center=TRUE, scale. = TRUE)
+ggbiplot(pca,
+         obs.scale = 1,
+         var.scale = 1,
+         var.axes = FALSE,
+         groups = Pdata1LN$`diagnosis:ch1`) +
+  ggtitle("PCA of GSE104948")
+
+
+pca <- prcomp(t(data3), center=TRUE, scale. = TRUE)
+ggbiplot(pca,
+         obs.scale = 1,
+         var.scale = 1,
+         var.axes = FALSE,
+         groups = Pdata3$disease) +
+  ggtitle("PCA of GSE32591")
+```
+
+
+#Creating a "signature"
+There is an apparent improvement in the separation of healthy and lupus samples
+when comparing pathway scores and the preprocessed data that can be seen in the 
+increase of information explained in the first principal component. In an attempt
+to improve the separation even further, a pca is used to visualize the separation
+when only the consistently differentially expressed genes from the preprocessed
+data is used.
+
+```{r}
+#Signature creation
+overlap <- DEG1$Gene %in% DEG3$Gene
+sig <- DEG1[overlap,]
+
+overlap2 <- DEG3$Gene %in% DEG1$Gene
+sig2 <- DEG3[overlap2,]
+
+index <- rownames(data1LN) %in% sig$Gene
+index3 <- rownames(data3) %in% sig2$Gene
+
+datasig1 <- data1LN[index,]
+datasig3 <- data3[index3,]
+
+
+#PCA
+pca <- prcomp(t(datasig1), center=TRUE, scale. = TRUE)
+ggbiplot(pca,
+         obs.scale = 1,
+         var.scale = 1,
+         var.axes = FALSE,
+         groups = Pdata1LN$`diagnosis:ch1`) +
+  ggtitle("PCA of GSE104948 DEG Overlap")
+
+
+
+pca <- prcomp(t(datasig3), center=TRUE, scale. = TRUE)
+ggbiplot(pca,
+         obs.scale = 1,
+         var.scale = 1,
+         var.axes = FALSE,
+         groups = Pdata3$disease) +
+  ggtitle("PCA of GSE32591 DEG Overlap")
+```
+
+
+#Applying signature on other datasets
+In order to test robustness of the "signature", it was applied to a different
+dataset with a different tissue (tubularinterstitial). Aside from these two
+differences, the characteristics of the datasets (technology, disease, organ,
+species, etc.) are the same. The result of the signature separation is again 
+visualized in a pca with a pca of the preprocessed data following.
+
+```{r}
+alldata2 <- readRDS(file = "/Users/saezlab/Documents/CKD_Data/Tub_Data/all_104954.rds")
+Pdata2 <- readRDS(file = "/Users/saezlab/Documents/CKD_Data/Tub_Data/Pdata_104954.rds")
+Pdata2$`diagnosis:ch1`[is.na(Pdata2$`diagnosis:ch1`)] <- "Healthy"
+
+onlyLN2 <- Pdata2$`diagnosis:ch1` == "Systemic lupus erythematosus" | Pdata2$`diagnosis:ch1` == "Healthy"
+data2LN <- alldata2[,onlyLN2]
+Pdata2LN <- Pdata2[onlyLN2,]
+
+
+index2 <- rownames(data2LN) %in% sig$Gene
+datasig2 <- data2LN[index2,]
+
+pca <- prcomp(t(datasig2), center=TRUE, scale. = TRUE)
+ggbiplot(pca,
+         obs.scale = 1,
+         var.scale = 1,
+         var.axes = FALSE,
+         groups = Pdata2LN$`diagnosis:ch1`) +
+  ggtitle("PCA of GSE104945 DEG Overlap")
+
+
+pca <- prcomp(t(data2LN), center=TRUE, scale. = TRUE)
+ggbiplot(pca,
+         obs.scale = 1,
+         var.scale = 1,
+         var.axes = FALSE,
+         groups = Pdata2LN$`diagnosis:ch1`) +
+  ggtitle("PCA of GSE104945")
 
 
 
 
+try <- rownames(data3) %in% sig$Gene
+leap <- data1[try,]
+
+
+pca <- prcomp(t(datasig3), center=TRUE, scale. = TRUE)
+ggbiplot(pca,
+         obs.scale = 1,
+         var.scale = 1,
+         var.axes = FALSE,
+         groups = Pdata3$disease) +
+  ggtitle("PCA of GSE32591")
+
+```
+
+
+#DEG and Progeny
+While the signature pca performed better than the preprocessed data pca with all
+genes, the pathway scores outperformed both. Therefore, in order to make this
+separation even more stark, the "signature" genes are used in Progeny to obtain
+pathways scores. This multi-component analysis performed better than all other
+methods (quantified by PC1%). This final result is seen in the following pca
+plots.
+
+```{r}
+pathways1 <- progeny(as.matrix(datasig1), scale = TRUE)
+
+pca1 <- prcomp(pathways1, center=TRUE, scale. = TRUE)
+ggbiplot(pca1,
+         obs.scale = 1,
+         var.scale = 1,
+         var.axes = FALSE,
+         groups = Pdata1LN$`diagnosis:ch1`) +
+  ggtitle("PCA of GSE104948 DEG Pathways")
 
 
 
+pathways3 <- progeny(as.matrix(datasig3), scale = TRUE)
 
+pca3 <- prcomp(pathways3, center=TRUE, scale. = TRUE)
+ggbiplot(pca1,
+         obs.scale = 1,
+         var.scale = 1,
+         var.axes = FALSE,
+         groups = Pdata3$disease) +
+  ggtitle("PCA of GSE32591 DEG Pathways")
+
+
+pathways2 <- progeny(as.matrix(data2LN), scale = TRUE)
+
+pca2 <- prcomp(pathways2, center=TRUE, scale. = TRUE)
+ggbiplot(pca2,
+         obs.scale = 1,
+         var.scale = 1,
+         var.axes = FALSE,
+         groups = Pdata2LN$`diagnosis:ch1`) +
+  ggtitle("PCA of GSE104945 Pathways")
+
+```
+
+
+While this signature does not separate Lupus Nephropathy from other chronic
+kidney diseases, it is evident that with multiscaled analysis the power of
+separation and molecular disease classification increases. Therefore, it is hoped
+that this study will stimulate further investigation in this field of multiscaled
+analyses.
 
